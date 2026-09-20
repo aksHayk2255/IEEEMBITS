@@ -42,12 +42,20 @@ export default function About() {
           <div className="flex flex-col justify-between gap-12 lg:col-span-5">
             <Reveal delay={0.05}>
               <p className="text-lg leading-relaxed text-ink/90">
-                Placeholder paragraph. Describe how the chapter started, who it is for, and what a
-                student gains by being part of it.
+                Born from the growing IEEE community at MBITS, the IEEE Computer Society brings
+                together students with a shared interest in computing, technology, and innovation.
+                It is a space for students to learn beyond the classroom, explore emerging
+                technologies, work on ideas, and connect with peers who share the same curiosity.
+                Being part of the chapter offers opportunities to develop technical skills, discover
+                new areas of computing, collaborate on projects, and grow as a confident technology
+                professional.
               </p>
               <p className="mt-6 text-base leading-relaxed text-muted">
-                Placeholder paragraph. Add a second short paragraph about the way the chapter
-                works — sessions, teams, mentorship, or whatever is true for your branch.
+                The chapter is built around learning by doing. Through technical sessions, workshops,
+                collaborative activities, projects, competitions, and peer-to-peer knowledge sharing,
+                students get opportunities to turn concepts into practical experience. We encourage
+                members to learn together, contribute their ideas, take initiative, and build
+                solutions that extend beyond the classroom.
               </p>
             </Reveal>
 
