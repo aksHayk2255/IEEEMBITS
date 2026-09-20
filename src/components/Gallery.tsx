@@ -1,4 +1,5 @@
-import { ImageIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ImageIcon, X } from 'lucide-react';
 import { gallery as localGallery, type GalleryImage } from '../data/gallery';
 import { useContent } from '../hooks/useContent';
 import DataState from './ui/DataState';
@@ -15,7 +16,17 @@ function cellClass(span?: 'wide' | 'tall') {
 
 export default function Gallery() {
   const content = useContent<Record<string, unknown>>('gallery', localGallery.map((image) => ({ ...image })));
-  const gallery: GalleryImage[] = content.data.map((image) => ({ src: String(image.image_url ?? image.src ?? ''), alt: String(image.title ?? image.alt ?? 'Chapter gallery image'), caption: image.description as string | undefined }));
+  const gallery: GalleryImage[] = content.data.map((image) => ({ src: String(image.image_url ?? image.src ?? ''), alt: String(image.title ?? image.alt ?? 'Chapter gallery image'), caption: image.description as string | undefined, title: image.title as string | undefined, details: image.details as string | undefined }));
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+
+  useEffect(() => {
+    if (!selectedImage) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedImage(null);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [selectedImage]);
   return (
     <section id="gallery" className="section-y">
       <div className="shell">
@@ -45,7 +56,7 @@ export default function Gallery() {
               {gallery.map((image, index) => (
                 <li key={image.src} className={cellClass(image.span)}>
                   <Reveal delay={index * 0.03} className="h-full">
-                    <figure className="group relative h-full overflow-hidden rounded-sm border border-line">
+                    <button type="button" onClick={() => setSelectedImage(image)} className="group relative block h-full w-full overflow-hidden rounded-sm border border-line text-left" aria-label={`Open details for ${image.title ?? image.alt}`}>
                       <img
                         src={image.src}
                         alt={image.alt}
@@ -53,11 +64,11 @@ export default function Gallery() {
                         className="h-full w-full bg-panel object-contain transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                       />
                       {image.caption && (
-                        <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg/90 to-transparent p-4 text-xs text-ink/90">
+                        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg/90 to-transparent p-4 text-xs text-ink/90">
                           {image.caption}
-                        </figcaption>
+                        </span>
                       )}
-                    </figure>
+                    </button>
                   </Reveal>
                 </li>
               ))}
@@ -65,6 +76,24 @@ export default function Gallery() {
           )}
         </DataState></div>
       </div>
+
+      {selectedImage && (
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-bg/90 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={selectedImage.title ?? selectedImage.alt} onClick={() => setSelectedImage(null)}>
+          <div className="grid max-h-[90vh] w-full max-w-5xl overflow-auto rounded-sm border border-line bg-panel lg:grid-cols-[1.1fr_0.9fr]" onClick={(event) => event.stopPropagation()}>
+            <div className="flex min-h-64 items-center justify-center bg-bg p-4 sm:p-8">
+              <img src={selectedImage.src} alt={selectedImage.alt} className="max-h-[70vh] w-full object-contain" />
+            </div>
+            <div className="relative p-6 sm:p-10">
+              <button type="button" onClick={() => setSelectedImage(null)} className="absolute top-5 right-5 grid h-9 w-9 place-items-center rounded-sm border border-line text-muted hover:border-accent hover:text-accent" aria-label="Close image details">
+                <X size={17} />
+              </button>
+              <p className="eyebrow text-accent">Chapter session</p>
+              <h3 className="mt-5 max-w-sm font-display text-3xl leading-tight text-ink sm:text-4xl">{selectedImage.title ?? selectedImage.caption}</h3>
+              {selectedImage.details && <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-muted">{selectedImage.details}</p>}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
