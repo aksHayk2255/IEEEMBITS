@@ -31,7 +31,7 @@ export default function Gallery() {
     <section id="gallery" className="section-y">
       <div className="shell">
         <SectionHeading
-          index="07"
+          index="06"
           label="Gallery"
           title={
             <>

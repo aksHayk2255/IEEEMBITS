@@ -8,7 +8,7 @@ export default function Contact() {
     <section id="contact" className="section-y">
       <div className="shell">
         <SectionHeading
-          index="08"
+          index="07"
           label="Contact"
           title="Let's connect."
           description="Reach the chapter through any of these. Replace each placeholder in src/data/contact.ts with the real detail."

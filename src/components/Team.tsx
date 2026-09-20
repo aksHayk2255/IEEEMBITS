@@ -43,7 +43,7 @@ export default function Team() {
     <section id="team" className="bg-panel section-y">
       <div className="shell">
         <SectionHeading
-          index="06"
+          index="05"
           label="Team"
           title={
             <>

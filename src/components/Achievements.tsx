@@ -15,7 +15,7 @@ export default function Achievements() {
     <section id="achievements" className="section-y">
       <div className="shell">
         <SectionHeading
-          index="05"
+          index="04"
           label="Achievements"
           title={
             <>
