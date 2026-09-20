@@ -1,7 +1,6 @@
 import { ArrowUpRight, CalendarDays } from 'lucide-react';
 import { events } from '../data/events';
 import EmptyState from './ui/EmptyState';
-import ImagePlaceholder from './ui/ImagePlaceholder';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 
@@ -31,40 +30,35 @@ export default function Events() {
               file="src/data/events.ts"
             />
           ) : (
-            <ul className="grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="relative border-l border-line">
               {events.map((event, index) => (
-                <li key={`${event.title}-${event.date}`} className="bg-bg">
+                <li key={`${event.title}-${event.date}`} className="relative pl-8 sm:pl-12">
+                  <span
+                    className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent"
+                    aria-hidden="true"
+                  />
                   <Reveal delay={index * 0.04}>
-                    <article className="group flex h-full flex-col gap-6 p-6 transition-colors duration-300 hover:bg-surface sm:p-8">
-                      {event.image ? (
-                        <img
-                          src={event.image}
-                          alt=""
-                          loading="lazy"
-                          className="aspect-[4/3] w-full rounded-sm object-cover"
-                        />
-                      ) : (
-                        <ImagePlaceholder label="Event photo" ratio="4 / 3" />
-                      )}
-
-                      <div className="flex flex-1 flex-col">
-                        <p className="text-xs tracking-[0.18em] text-muted uppercase">
-                          {event.category} <span className="px-1.5 text-line-strong">·</span>{' '}
-                          {event.date}
+                    <article className="border-b border-line pb-10 pt-1 transition-colors duration-300 last:border-b-0 sm:grid sm:grid-cols-[12rem_1fr] sm:gap-8 sm:pb-12">
+                      <div>
+                        <p className="text-xs tracking-[0.18em] text-muted uppercase">{event.date}</p>
+                        <p className="mt-2 text-xs tracking-[0.16em] text-accent uppercase">
+                          {event.category}
                         </p>
+                      </div>
 
-                        <h3 className="mt-4 font-display text-2xl leading-tight text-ink sm:text-3xl">
+                      <div className="mt-5 sm:mt-0">
+                        <h3 className="font-display text-2xl leading-tight text-ink sm:text-3xl">
                           {event.title}
                         </h3>
 
-                        <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
+                        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
                           {event.description}
                         </p>
 
                         {event.link && (
                           <a
                             href={event.link}
-                            className="mt-6 inline-flex items-center gap-1.5 text-sm text-accent"
+                            className="mt-5 inline-flex items-center gap-1.5 text-sm text-accent"
                           >
                             View details
                             <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
