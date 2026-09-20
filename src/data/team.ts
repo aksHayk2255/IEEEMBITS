@@ -11,7 +11,7 @@ export interface TeamMember {
  * so keep the chair and vice-chair at the top if you want them first.
  */
 export const team: TeamMember[] = [
-  { name: 'Eldhose P. Sim', role: 'Chapter Advisor' },
+  { name: 'Eldhose P.SIM', role: 'Chapter Advisor' },
   { name: 'Syno Shaji Kurian', role: 'Chair' },
   { name: 'Neswin Easter', role: 'Vice Chair' },
   { name: 'Alen Basil', role: 'Secretary' },
