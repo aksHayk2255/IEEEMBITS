@@ -14,18 +14,18 @@ as $$ select exists (select 1 from public.admin_users where user_id = auth.uid()
 create table if not exists public.events (
   id uuid primary key default gen_random_uuid(), title text not null, slug text unique not null,
   description text not null default '', date date not null, location text not null default '',
-  registration_url text, image_url text, featured boolean not null default false,
+  registration_url text, image_url text, featured boolean not null default false, published boolean not null default true,
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 create table if not exists public.projects (
   id uuid primary key default gen_random_uuid(), title text not null, slug text unique not null,
   description text not null default '', technologies text[] not null default '{}', github_url text,
-  demo_url text, image_url text, featured boolean not null default false,
+  demo_url text, image_url text, featured boolean not null default false, published boolean not null default true,
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 create table if not exists public.achievements (
   id uuid primary key default gen_random_uuid(), title text not null, description text not null default '',
-  year integer not null, image_url text, featured boolean not null default false,
+  year integer not null, image_url text, featured boolean not null default false, published boolean not null default true,
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 create table if not exists public.team_members (
@@ -66,9 +66,9 @@ alter table public.team_members enable row level security;
 alter table public.gallery enable row level security;
 alter table public.announcements enable row level security;
 
-create policy "public read events" on public.events for select using (true);
-create policy "public read projects" on public.projects for select using (true);
-create policy "public read achievements" on public.achievements for select using (true);
+create policy "public read published events" on public.events for select using (published = true);
+create policy "public read published projects" on public.projects for select using (published = true);
+create policy "public read published achievements" on public.achievements for select using (published = true);
 create policy "public read active team" on public.team_members for select using (active = true);
 create policy "public read gallery" on public.gallery for select using (true);
 create policy "public read active announcements" on public.announcements for select using (active = true);
