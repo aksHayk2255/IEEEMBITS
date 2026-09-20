@@ -1,4 +1,4 @@
-import sessionImage from '../assets/images/session.jpeg';
+import sessionImage from '../assets/images/session-optimized.jpeg';
 
 export interface GalleryImage {
   /** Import the file from src/assets/images and pass the imported value here. */
