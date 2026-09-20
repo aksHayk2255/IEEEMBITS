@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { fadeUp, stagger, still } from '../lib/motion';
+import heroImage from '../assets/images/hero.jpeg';
 import ActionLink from './ui/ActionLink';
-import ImagePlaceholder from './ui/ImagePlaceholder';
 
 export default function Hero() {
   const reduceMotion = useReducedMotion();
@@ -44,22 +44,15 @@ export default function Hero() {
           </motion.div>
 
           <motion.div variants={item} className="mt-14 sm:mt-20">
-            {/*
-              Swap this for a real campus photograph:
-                import campus from '../assets/images/campus.jpg';
-                <img src={campus} alt="MBITS campus" className="h-full w-full rounded-sm object-cover" />
-            */}
-            <ImagePlaceholder
-              label="Wide campus or chapter photograph"
-              file="src/assets/images/hero.jpg"
-              ratio="21 / 9"
-              className="hidden sm:block"
+            <img
+              src={heroImage}
+              alt="IEEE Computer Society MBITS campus and chapter"
+              className="hidden aspect-[21/9] w-full rounded-sm object-cover sm:block"
             />
-            <ImagePlaceholder
-              label="Campus or chapter photograph"
-              file="src/assets/images/hero.jpg"
-              ratio="4 / 3"
-              className="sm:hidden"
+            <img
+              src={heroImage}
+              alt="IEEE Computer Society MBITS campus and chapter"
+              className="aspect-[4/3] w-full rounded-sm object-cover sm:hidden"
             />
           </motion.div>
         </motion.div>
