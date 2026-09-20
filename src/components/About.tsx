@@ -1,6 +1,6 @@
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
-import teamImage from '../assets/images/Team.png';
+import teamImage from '../assets/images/Team.jpeg';
 
 /**
  * Replace the em dashes with real figures once they are confirmed.
@@ -35,7 +35,7 @@ export default function About() {
                 src={teamImage}
                 alt="IEEE Computer Society MBITS team"
                 loading="lazy"
-                className="aspect-[4/3] w-full rounded-sm object-cover"
+                className="h-auto w-full rounded-sm object-contain"
               />
             </Reveal>
           </div>
