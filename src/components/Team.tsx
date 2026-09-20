@@ -1,7 +1,6 @@
-import { ArrowUpRight, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { team } from '../data/team';
 import EmptyState from './ui/EmptyState';
-import ImagePlaceholder from './ui/ImagePlaceholder';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 
@@ -27,59 +26,28 @@ export default function Team() {
             <EmptyState
               icon={<Users size={28} strokeWidth={1.25} />}
               title="Team details coming soon"
-              hint="Add each member's name, role and photo to introduce the team here."
+              hint="Add the chapter leadership details to introduce the team here."
               file="src/data/team.ts"
             />
           ) : (
-            <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
               {team.map((member, index) => (
-                <li key={member.name}>
+                <li key={member.name} className="bg-bg">
                   <Reveal delay={index * 0.04}>
-                    <article className="group">
-                      {member.photo ? (
-                        <img
-                          src={member.photo}
-                          alt={member.name}
-                          loading="lazy"
-                          className="aspect-[3/4] w-full rounded-sm object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
-                        />
-                      ) : (
-                        <ImagePlaceholder label="Portrait" ratio="3 / 4" />
-                      )}
+                    <article className="group flex min-h-44 flex-col justify-between p-6 transition-colors duration-300 hover:bg-surface sm:min-h-52 sm:p-8">
+                      <div className="flex items-start justify-between gap-4">
+                        <span className="text-xs tracking-[0.18em] text-accent uppercase">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="h-px w-10 bg-line-strong transition-all duration-300 group-hover:w-16 group-hover:bg-accent" />
+                      </div>
 
-                      <h3 className="mt-5 text-lg text-ink">{member.name}</h3>
-                      <p className="mt-1 text-sm text-muted">{member.role}</p>
-
-                      {(member.linkedin || member.github || member.email) && (
-                        <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted">
-                          {member.linkedin && (
-                            <a
-                              href={member.linkedin}
-                              className="inline-flex items-center gap-1 transition-colors hover:text-accent"
-                            >
-                              LinkedIn
-                              <ArrowUpRight size={13} strokeWidth={1.75} aria-hidden="true" />
-                            </a>
-                          )}
-                          {member.github && (
-                            <a
-                              href={member.github}
-                              className="inline-flex items-center gap-1 transition-colors hover:text-accent"
-                            >
-                              GitHub
-                              <ArrowUpRight size={13} strokeWidth={1.75} aria-hidden="true" />
-                            </a>
-                          )}
-                          {member.email && (
-                            <a
-                              href={`mailto:${member.email}`}
-                              className="transition-colors hover:text-accent"
-                            >
-                              Email
-                            </a>
-                          )}
-                        </div>
-                      )}
+                      <div className="mt-12">
+                        <p className="text-xs tracking-[0.16em] text-muted uppercase">{member.role}</p>
+                        <h3 className="mt-3 font-display text-2xl leading-tight text-ink sm:text-3xl">
+                          {member.name}
+                        </h3>
+                      </div>
                     </article>
                   </Reveal>
                 </li>
