@@ -25,8 +25,15 @@ export default function About() {
               <br />a club.
             </>
           }
-          description="A student-driven community exploring the world of computing through learning, building, and collaboration. IEEE Computer Society MBITS connects curious minds, encourages innovation, and creates opportunities to turn ideas into meaningful technology."
         />
+
+        <Reveal delay={0.1} className="mt-8 max-w-3xl lg:mt-10">
+          <p className="lede">
+            A student-driven community exploring the world of computing through learning, building,
+            and collaboration. IEEE Computer Society MBITS connects curious minds, encourages
+            innovation, and creates opportunities to turn ideas into meaningful technology.
+          </p>
+        </Reveal>
 
         <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
