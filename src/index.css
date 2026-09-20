@@ -1,0 +1,172 @@
+@import 'tailwindcss';
+
+/*
+  Design tokens.
+  Tailwind v4 turns every --color-* entry below into utilities:
+  --color-surface  ->  bg-surface / text-surface / border-surface
+*/
+@theme {
+  --color-bg: #080b0d;
+  --color-panel: #0d1215;
+  --color-surface: #11181c;
+  --color-ink: #f4f6f7;
+  --color-muted: #8b969d;
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-line-strong: rgba(255, 255, 255, 0.18);
+  --color-accent: #9dd8e5;
+
+  --font-sans: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    /* Offset for the fixed navbar when jumping to a section */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Nothing should ever scroll sideways */
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+}
+
+/*
+  A handful of project-level classes. Everything else is written as
+  utilities inside the components so styles stay next to the markup.
+*/
+@layer components {
+  /* Page gutter. One place to change the horizontal rhythm of the whole site. */
+  .shell {
+    width: 100%;
+    max-width: 90rem; /* 1440px */
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 5rem);
+  }
+
+  /* Vertical rhythm between major sections */
+  .section-y {
+    padding-block: clamp(5rem, 11vw, 9.5rem);
+  }
+
+  /* Section eyebrow: 03 / EVENTS */
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* Editorial section headline */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 0.98;
+    font-size: clamp(2.5rem, 6.5vw, 5rem);
+  }
+
+  /* Hero headline: tight, monumental, uppercase grotesk */
+  .hero-type {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: -0.045em;
+    line-height: 0.88;
+    font-size: clamp(2.75rem, 10.5vw, 8.25rem);
+  }
+
+  .lede {
+    font-size: clamp(1rem, 1.35vw, 1.15rem);
+    line-height: 1.65;
+    color: var(--color-muted);
+    max-width: 46ch;
+  }
+
+  /* Faint technical grid used behind the hero and the CTA band */
+  .grid-field {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 72px 72px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 20%, transparent 78%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 20%, transparent 78%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
