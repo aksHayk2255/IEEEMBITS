@@ -1,10 +1,10 @@
 import chapterAdvisorImage from '../assets/images/chapter_advisor.png';
-import chairImage from '../assets/images/chair.png';
-import viceChairImage from '../assets/images/vice_chair.png';
-import secretaryImage from '../assets/images/secretary.png';
-import treasurerImage from '../assets/images/treasurer.png';
-import webMasterImage from '../assets/images/web_master.png';
-import wicsImage from '../assets/images/wics.png';
+import chairImage from '../assets/images/chair.jpeg';
+import viceChairImage from '../assets/images/vice_chair.jpeg';
+import secretaryImage from '../assets/images/secretary.jpeg';
+import treasurerImage from '../assets/images/treasurer.jpeg';
+import webMasterImage from '../assets/images/web_master.jpeg';
+import wicsImage from '../assets/images/wics.jpeg';
 
 export interface TeamMember {
   name: string;

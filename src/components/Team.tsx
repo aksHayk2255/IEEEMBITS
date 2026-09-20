@@ -71,7 +71,7 @@ export default function Team() {
               onFocus={() => setIsPaused(true)}
               onBlur={() => setIsPaused(false)}
             >
-              <div className="relative aspect-[4/3] sm:aspect-[16/10]">
+              <div className="relative min-h-[34rem] sm:aspect-[16/10] sm:min-h-0">
                 <AnimatePresence initial={false} mode="wait">
                   <motion.article
                     key={team[activeIndex].name}
@@ -79,14 +79,14 @@ export default function Team() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={reduceMotion ? { opacity: 1 } : { opacity: 0, x: -48 }}
                     transition={{ duration: reduceMotion ? 0 : 0.45, ease: 'easeOut' }}
-                    className="absolute inset-0 grid grid-cols-1 sm:grid-cols-[1fr_1fr]"
+                    className="absolute inset-0 grid grid-rows-[minmax(15rem,1fr)_auto] sm:grid-cols-[1fr_1fr] sm:grid-rows-none"
                   >
                     <div className="relative min-h-56 bg-surface">
                       {team[activeIndex].photo ? (
                         <img
                           src={team[activeIndex].photo}
                           alt={`${team[activeIndex].name}, ${team[activeIndex].role}`}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-contain"
                         />
                       ) : (
                         <div className="grid h-full place-items-center text-sm text-muted">Photo unavailable</div>
@@ -96,8 +96,8 @@ export default function Team() {
                       <p className="text-xs tracking-[0.2em] text-accent uppercase">
                         {String(activeIndex + 1).padStart(2, '0')} / {String(team.length).padStart(2, '0')}
                       </p>
-                      <p className="mt-8 text-xs tracking-[0.16em] text-muted uppercase">{team[activeIndex].role}</p>
-                      <h3 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-4xl">
+                      <p className="mt-5 text-xs tracking-[0.16em] text-muted uppercase sm:mt-8">{team[activeIndex].role}</p>
+                      <h3 className="mt-3 break-words font-display text-2xl leading-tight text-ink sm:text-4xl">
                         {team[activeIndex].name}
                       </h3>
                     </div>
