@@ -45,8 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     configured: isSupabaseConfigured,
     signIn: async (email, password) => {
       if (!supabase) return { error: 'Supabase is not configured.' };
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return error ? { error: error.message } : {};
+      try {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        return error ? { error: error.message } : {};
+      } catch {
+        return { error: 'Cannot connect to Supabase. Check VITE_SUPABASE_URL and restart the dev server.' };
+      }
     },
     signOut: async () => {
       if (supabase) await supabase.auth.signOut();
