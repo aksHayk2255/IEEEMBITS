@@ -34,36 +34,29 @@ export default function Events() {
               file="src/data/events.ts"
             />
           ) : (
-            <ul className="relative border-l border-line">
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {events.map((event, index) => (
-                <li key={`${event.title}-${event.date}`} className="relative pl-8 sm:pl-12">
-                  <span
-                    className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent"
-                    aria-hidden="true"
-                  />
+                <li key={`${event.title}-${event.date}`}>
                   <Reveal delay={index * 0.04}>
-                    <article className="border-b border-line pb-10 pt-1 transition-colors duration-300 last:border-b-0 sm:grid sm:grid-cols-[12rem_1fr] sm:gap-8 sm:pb-12">
-                      <div>
-                        <p className="text-xs tracking-[0.18em] text-muted uppercase">{event.date}</p>
-                        <p className="mt-2 text-xs tracking-[0.16em] text-accent uppercase">
-                          {event.category}
+                    <article className="group flex min-h-72 flex-col border border-line bg-panel p-6 transition-all duration-300 hover:-translate-y-1 hover:border-line-strong hover:bg-surface sm:p-8">
+                      <div className="flex items-start justify-between gap-4 border-b border-line pb-5">
+                        <span className="text-xs tracking-[0.2em] text-accent uppercase">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <p className="text-right text-xs tracking-[0.14em] text-muted uppercase">
+                          {event.date}
                         </p>
                       </div>
 
-                      <div className="mt-5 sm:mt-0">
-                        <h3 className="font-display text-2xl leading-tight text-ink sm:text-3xl">
+                      <div className="flex flex-1 flex-col pt-6">
+                        <p className="text-xs tracking-[0.16em] text-accent uppercase">{event.category}</p>
+                        <h3 className="mt-4 font-display text-2xl leading-tight text-ink transition-colors duration-300 group-hover:text-accent sm:text-3xl">
                           {event.title}
                         </h3>
-
-                        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-                          {event.description}
-                        </p>
+                        <p className="mt-4 flex-1 text-sm leading-relaxed text-muted">{event.description}</p>
 
                         {event.link && (
-                          <a
-                            href={event.link}
-                            className="mt-5 inline-flex items-center gap-1.5 text-sm text-accent"
-                          >
+                          <a href={event.link} className="mt-6 inline-flex items-center gap-1.5 text-sm text-accent">
                             View details
                             <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
                           </a>
