@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Menu, X } from 'lucide-react';
-import societyLogo from '../assets/images/ieee-computer-society-logo.png.jpeg';
+import societyLogo from '../assets/images/ieee-computer-society-logo-cropped.jpeg';
 import { navLinks } from '../data/navigation';
 import { useActiveSection } from '../lib/useActiveSection';
 
@@ -44,11 +44,11 @@ export default function Navbar() {
     >
       <nav className="shell flex h-18 items-center justify-between py-4" aria-label="Main">
         <a href="#home" className="flex items-center gap-3" onClick={() => setMenuOpen(false)}>
-          <span className="h-9 w-36 overflow-hidden rounded-sm bg-white sm:h-10 sm:w-40">
+          <span className="h-9 w-32 overflow-hidden rounded-sm bg-white sm:h-10 sm:w-36">
             <img
               src={societyLogo}
               alt="IEEE Computer Society"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           </span>
           <span className="text-[0.7rem] font-semibold tracking-[0.14em] text-ink uppercase">
