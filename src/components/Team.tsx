@@ -9,7 +9,18 @@ import SectionHeading from './ui/SectionHeading';
 
 export default function Team() {
   const content = useContent<Record<string, unknown>>('team_members', localTeam.map((member) => ({ ...member })));
-  const team: TeamMember[] = content.data.map((member) => ({ name: String(member.name ?? ''), role: String(member.position ?? member.role ?? ''), photo: member.image_url as string | undefined, linkedin: member.linkedin_url as string | undefined, email: member.email as string | undefined }));
+  const team: TeamMember[] = content.data.map((member) => {
+    const name = String(member.name ?? '');
+    const role = String(member.position ?? member.role ?? '');
+    const localMember = localTeam.find((candidate) => candidate.name === name || candidate.role === role);
+    return {
+      name,
+      role,
+      photo: (member.image_url as string | undefined) || (member.photo as string | undefined) || localMember?.photo,
+      linkedin: member.linkedin_url as string | undefined,
+      email: member.email as string | undefined,
+    };
+  });
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const reduceMotion = useReducedMotion();
