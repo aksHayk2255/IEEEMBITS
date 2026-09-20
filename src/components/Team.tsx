@@ -16,7 +16,7 @@ export default function Team() {
     return {
       name,
       role,
-      photo: (member.image_url as string | undefined) || (member.photo as string | undefined) || localMember?.photo,
+      photo: localMember?.photo || (member.image_url as string | undefined) || (member.photo as string | undefined),
       linkedin: member.linkedin_url as string | undefined,
       email: member.email as string | undefined,
     };
