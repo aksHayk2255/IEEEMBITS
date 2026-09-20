@@ -1,14 +1,33 @@
-import { Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Users } from 'lucide-react';
 import { team as localTeam, type TeamMember } from '../data/team';
 import { useContent } from '../hooks/useContent';
 import DataState from './ui/DataState';
 import EmptyState from './ui/EmptyState';
-import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 
 export default function Team() {
   const content = useContent<Record<string, unknown>>('team_members', localTeam.map((member) => ({ ...member })));
-  const team: TeamMember[] = content.data.map((member) => ({ name: String(member.name ?? ''), role: String(member.position ?? member.role ?? ''), linkedin: member.linkedin_url as string | undefined, email: member.email as string | undefined }));
+  const team: TeamMember[] = content.data.map((member) => ({ name: String(member.name ?? ''), role: String(member.position ?? member.role ?? ''), photo: member.image_url as string | undefined, linkedin: member.linkedin_url as string | undefined, email: member.email as string | undefined }));
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (team.length < 2 || isPaused) return;
+    const timer = window.setInterval(() => {
+      setActiveIndex((currentIndex) => (currentIndex + 1) % team.length);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [isPaused, team.length]);
+
+  useEffect(() => {
+    if (activeIndex >= team.length) setActiveIndex(0);
+  }, [activeIndex, team.length]);
+
+  const showPrevious = () => setActiveIndex((currentIndex) => (currentIndex - 1 + team.length) % team.length);
+  const showNext = () => setActiveIndex((currentIndex) => (currentIndex + 1) % team.length);
   return (
     <section id="team" className="bg-panel section-y">
       <div className="shell">
@@ -34,29 +53,59 @@ export default function Team() {
               file="src/data/team.ts"
             />
           ) : (
-            <ul className="grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-              {team.map((member, index) => (
-                <li key={member.name} className="bg-bg">
-                  <Reveal delay={index * 0.04}>
-                    <article className="group flex min-h-44 flex-col justify-between p-6 transition-colors duration-300 hover:bg-surface sm:min-h-52 sm:p-8">
-                      <div className="flex items-start justify-between gap-4">
-                        <span className="text-xs tracking-[0.18em] text-accent uppercase">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <span className="h-px w-10 bg-line-strong transition-all duration-300 group-hover:w-16 group-hover:bg-accent" />
-                      </div>
+            <div
+              className="relative mx-auto max-w-2xl overflow-hidden rounded-sm border border-line bg-bg"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+              onFocus={() => setIsPaused(true)}
+              onBlur={() => setIsPaused(false)}
+            >
+              <div className="relative aspect-[4/3] sm:aspect-[16/10]">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.article
+                    key={team[activeIndex].name}
+                    initial={reduceMotion ? { opacity: 1 } : { opacity: 0, x: 48 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={reduceMotion ? { opacity: 1 } : { opacity: 0, x: -48 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.45, ease: 'easeOut' }}
+                    className="absolute inset-0 grid grid-cols-1 sm:grid-cols-[1fr_1fr]"
+                  >
+                    <div className="relative min-h-56 bg-surface">
+                      {team[activeIndex].photo ? (
+                        <img
+                          src={team[activeIndex].photo}
+                          alt={`${team[activeIndex].name}, ${team[activeIndex].role}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center text-sm text-muted">Photo unavailable</div>
+                      )}
+                    </div>
+                    <div className="flex flex-col justify-end bg-panel p-6 sm:p-10">
+                      <p className="text-xs tracking-[0.2em] text-accent uppercase">
+                        {String(activeIndex + 1).padStart(2, '0')} / {String(team.length).padStart(2, '0')}
+                      </p>
+                      <p className="mt-8 text-xs tracking-[0.16em] text-muted uppercase">{team[activeIndex].role}</p>
+                      <h3 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-4xl">
+                        {team[activeIndex].name}
+                      </h3>
+                    </div>
+                  </motion.article>
+                </AnimatePresence>
+              </div>
 
-                      <div className="mt-12">
-                        <p className="text-xs tracking-[0.16em] text-muted uppercase">{member.role}</p>
-                        <h3 className="mt-3 font-display text-2xl leading-tight text-ink sm:text-3xl">
-                          {member.name}
-                        </h3>
-                      </div>
-                    </article>
-                  </Reveal>
-                </li>
-              ))}
-            </ul>
+              <div className="flex items-center justify-between border-t border-line px-5 py-4">
+                <p className="text-xs text-muted">Leadership, one story at a time.</p>
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={showPrevious} className="grid h-9 w-9 place-items-center rounded-sm border border-line text-muted hover:border-accent hover:text-accent" aria-label="Previous team member">
+                    <ArrowLeft size={16} />
+                  </button>
+                  <button type="button" onClick={showNext} className="grid h-9 w-9 place-items-center rounded-sm border border-line text-muted hover:border-accent hover:text-accent" aria-label="Next team member">
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </DataState></div>
       </div>
