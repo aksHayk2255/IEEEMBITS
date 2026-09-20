@@ -1,6 +1,6 @@
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
-import ImagePlaceholder from './ui/ImagePlaceholder';
+import teamImage from '../assets/images/Team.png';
 
 /**
  * Replace the em dashes with real figures once they are confirmed.
@@ -31,10 +31,11 @@ export default function About() {
         <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <Reveal>
-              <ImagePlaceholder
-                label="Chapter members at work"
-                file="src/assets/images/about.jpg"
-                ratio="4 / 3"
+              <img
+                src={teamImage}
+                alt="IEEE Computer Society MBITS team"
+                loading="lazy"
+                className="aspect-[4/3] w-full rounded-sm object-cover"
               />
             </Reveal>
           </div>
