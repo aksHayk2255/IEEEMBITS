@@ -7,25 +7,25 @@ const areas = [
     number: '01',
     title: 'Learn',
     description:
-      'Placeholder — sessions, study groups and workshops that take members from curious to capable.',
+      'Technical sessions, study groups, and workshops that help members build confidence from their first question to their next breakthrough.',
   },
   {
     number: '02',
     title: 'Build',
     description:
-      'Placeholder — small teams turning classroom ideas into working software and hardware.',
+      'Small teams turn classroom ideas into practical software, hardware, and experiments that solve real problems.',
   },
   {
     number: '03',
     title: 'Compete',
     description:
-      'Placeholder — hackathons, contests and challenges the chapter takes part in together.',
+      'Hackathons, contests, and challenges give members a place to test their skills, think boldly, and grow together.',
   },
   {
     number: '04',
     title: 'Connect',
     description:
-      'Placeholder — talks, alumni links and the wider IEEE network students can reach through us.',
+      'Talks, peer collaboration, alumni connections, and the wider IEEE network open doors to new people, perspectives, and opportunities.',
   },
 ];
 
