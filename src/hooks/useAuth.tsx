@@ -22,12 +22,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) return;
     const checkAdmin = async (nextSession: Session | null) => {
       if (!nextSession) { setIsAdmin(false); return; }
-      const { data } = await supabase!.rpc('is_admin');
-      setIsAdmin(data === true);
+      try {
+        const { data, error } = await supabase!.rpc('is_admin');
+        setIsAdmin(!error && data === true);
+      } catch {
+        setIsAdmin(false);
+      }
     };
     void supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
       await checkAdmin(data.session);
+      setLoading(false);
+    }).catch(() => {
+      setSession(null);
+      setIsAdmin(false);
       setLoading(false);
     });
     const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
