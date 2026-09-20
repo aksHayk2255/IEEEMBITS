@@ -32,8 +32,7 @@ export default function Achievements() {
             <EmptyState
               icon={<Award size={28} strokeWidth={1.25} />}
               title="To be added"
-              hint="Add the chapter's first milestone and it will appear on this timeline."
-              file="src/data/achievements.ts"
+              hint=""
             />
           ) : (
             <>

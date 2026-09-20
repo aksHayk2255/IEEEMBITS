@@ -22,7 +22,7 @@ export default function EmptyState({ icon, title, hint, file }: EmptyStateProps)
           {icon}
         </span>
         <p className="font-display text-2xl text-ink sm:text-3xl">{title}</p>
-        <p className="max-w-sm text-sm text-muted">{hint}</p>
+        {hint && <p className="max-w-sm text-sm text-muted">{hint}</p>}
         {file && (
           <code className="mt-2 rounded-sm border border-line px-3 py-1.5 text-xs tracking-wide text-muted">
             {file}
