@@ -1,3 +1,5 @@
+import sessionImage from '../assets/images/session.jpeg';
+
 export interface GalleryImage {
   /** Import the file from src/assets/images and pass the imported value here. */
   src: string;
@@ -12,4 +14,11 @@ export interface GalleryImage {
  * Add real chapter photographs here. Until then the Gallery section
  * shows an empty state rather than stock imagery.
  */
-export const gallery: GalleryImage[] = [];
+export const gallery: GalleryImage[] = [
+  {
+    src: sessionImage,
+    alt: 'IEEE Computer Society MBITS session',
+    caption: 'Chapter session',
+    span: 'wide',
+  },
+];
