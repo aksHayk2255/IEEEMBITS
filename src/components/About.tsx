@@ -25,7 +25,7 @@ export default function About() {
               <br />a club.
             </>
           }
-          description="Placeholder description — replace this with the chapter's own words about what the IEEE Computer Society student branch at MBITS stands for."
+          description="A student-driven community exploring the world of computing through learning, building, and collaboration. IEEE Computer Society MBITS connects curious minds, encourages innovation, and creates opportunities to turn ideas into meaningful technology."
         />
 
         <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-16">
