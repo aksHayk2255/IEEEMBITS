@@ -101,5 +101,63 @@ keyboard, and the layout has no horizontal overflow from 320px upward.
 
 ## Deploying
 
+## Supabase CMS and admin dashboard
+
+The project includes a protected content-management dashboard at `/admin` and
+uses Supabase for authentication, PostgreSQL content, and image storage. The
+public site keeps its existing visual design and uses Supabase data when the
+environment variables are configured. Without them, local fallback content is
+used so the public GitHub Pages site remains buildable.
+
+### Environment variables
+
+Copy `.env.example` to `.env.local` and add the browser-safe Supabase values:
+
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-publishable-anon-key
+```
+
+Never put a Supabase service-role key in this project.
+
+### Supabase setup
+
+1. Create a Supabase project.
+2. Run `supabase/schema.sql` in the Supabase SQL Editor.
+3. Run `supabase/storage.sql` in the SQL Editor.
+4. In Authentication, create the first user with email and password. Do not enable public signup.
+5. Copy that user's UUID and run:
+
+```sql
+insert into public.admin_users (user_id) values ('YOUR_AUTH_USER_UUID');
+```
+
+6. Add the environment variables to `.env.local` and restart `npm run dev`.
+7. Open `/IEEEMBITS/admin/login` locally or `/IEEEMBITS/admin/login` on the deployed site.
+
+The dashboard supports events, projects, achievements, team members, gallery
+images, and announcements. It validates JPG/JPEG/PNG/WebP uploads and limits
+them to 5 MB. Delete actions require confirmation. RLS policies allow public
+reads only for active team members and announcements, while all mutations
+require explicit membership in `admin_users`.
+
+### Local development with CMS
+
+```bash
+npm install
+npm run dev
+```
+
+The public site is available at `http://localhost:5173/IEEEMBITS/` and the
+dashboard at `http://localhost:5173/IEEEMBITS/admin/login`.
+
+### Deployment with CMS
+
+Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository Actions
+variables or secrets before deploying. The existing GitHub Pages workflow
+builds the Vite app and preserves client-side admin routes with a `404.html`
+SPA fallback. Supabase remains the hosted backend; GitHub Pages only serves the
+frontend.
+
 - **Vercel / Netlify** — framework preset "Vite", build `npm run build`, output `dist`.
 - **GitHub Pages** — set `base: '/<repo-name>/'` in `vite.config.ts`, then publish `dist`.

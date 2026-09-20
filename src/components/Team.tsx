@@ -1,10 +1,14 @@
 import { Users } from 'lucide-react';
-import { team } from '../data/team';
+import { team as localTeam, type TeamMember } from '../data/team';
+import { useContent } from '../hooks/useContent';
+import DataState from './ui/DataState';
 import EmptyState from './ui/EmptyState';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 
 export default function Team() {
+  const content = useContent<Record<string, unknown>>('team_members', localTeam.map((member) => ({ ...member })));
+  const team: TeamMember[] = content.data.map((member) => ({ name: String(member.name ?? ''), role: String(member.position ?? member.role ?? ''), linkedin: member.linkedin_url as string | undefined, email: member.email as string | undefined }));
   return (
     <section id="team" className="bg-panel section-y">
       <div className="shell">
@@ -21,7 +25,7 @@ export default function Team() {
           description="The students who plan, run and keep the chapter going."
         />
 
-        <div className="mt-16 lg:mt-24">
+        <div className="mt-16 lg:mt-24"><DataState loading={content.loading} error={content.error}>
           {team.length === 0 ? (
             <EmptyState
               icon={<Users size={28} strokeWidth={1.25} />}
@@ -54,7 +58,7 @@ export default function Team() {
               ))}
             </ul>
           )}
-        </div>
+        </DataState></div>
       </div>
     </section>
   );

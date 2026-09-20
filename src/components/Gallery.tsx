@@ -1,5 +1,7 @@
 import { ImageIcon } from 'lucide-react';
-import { gallery } from '../data/gallery';
+import { gallery as localGallery, type GalleryImage } from '../data/gallery';
+import { useContent } from '../hooks/useContent';
+import DataState from './ui/DataState';
 import EmptyState from './ui/EmptyState';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
@@ -12,6 +14,8 @@ function cellClass(span?: 'wide' | 'tall') {
 }
 
 export default function Gallery() {
+  const content = useContent<Record<string, unknown>>('gallery', localGallery.map((image) => ({ ...image })));
+  const gallery: GalleryImage[] = content.data.map((image) => ({ src: String(image.image_url ?? image.src ?? ''), alt: String(image.title ?? image.alt ?? 'Chapter gallery image'), caption: image.description as string | undefined }));
   return (
     <section id="gallery" className="section-y">
       <div className="shell">
@@ -28,7 +32,7 @@ export default function Gallery() {
           description="Photographs from chapter sessions, events and everything in between."
         />
 
-        <div className="mt-16 lg:mt-24">
+        <div className="mt-16 lg:mt-24"><DataState loading={content.loading} error={content.error}>
           {gallery.length === 0 ? (
             <EmptyState
               icon={<ImageIcon size={28} strokeWidth={1.25} />}
@@ -59,7 +63,7 @@ export default function Gallery() {
               ))}
             </ul>
           )}
-        </div>
+        </DataState></div>
       </div>
     </section>
   );

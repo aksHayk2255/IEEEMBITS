@@ -31,7 +31,13 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
+
+      - name: Preserve SPA routes on GitHub Pages
+        run: cp dist/index.html dist/404.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

@@ -1,10 +1,14 @@
 import { ArrowUpRight, CalendarDays } from 'lucide-react';
-import { events } from '../data/events';
+import { events as localEvents, type Event } from '../data/events';
 import EmptyState from './ui/EmptyState';
+import DataState from './ui/DataState';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
+import { useContent } from '../hooks/useContent';
 
 export default function Events() {
+  const content = useContent<Event & { location?: string }>('events', localEvents);
+  const events = content.data.map((event) => ({ ...event, category: event.category || event.location || 'Chapter event' }));
   return (
     <section id="events" className="section-y">
       <div className="shell">
@@ -21,7 +25,7 @@ export default function Events() {
           description="Workshops, talks and sessions run by the chapter through the year."
         />
 
-        <div className="mt-16 lg:mt-24">
+        <div className="mt-16 lg:mt-24"><DataState loading={content.loading} error={content.error}>
           {events.length === 0 ? (
             <EmptyState
               icon={<CalendarDays size={28} strokeWidth={1.25} />}
@@ -70,7 +74,7 @@ export default function Events() {
                 </li>
               ))}
             </ul>
-          )}
+          )}</DataState>
         </div>
       </div>
     </section>

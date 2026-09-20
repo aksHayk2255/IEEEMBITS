@@ -1,10 +1,14 @@
 import { Award } from 'lucide-react';
-import { achievements } from '../data/achievements';
+import { achievements as localAchievements, type Achievement } from '../data/achievements';
+import { useContent } from '../hooks/useContent';
+import DataState from './ui/DataState';
 import EmptyState from './ui/EmptyState';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 
 export default function Achievements() {
+  const content = useContent<Record<string, unknown>>('achievements', localAchievements.map((item) => ({ ...item })));
+  const achievements: Achievement[] = content.data.map((item) => ({ title: String(item.title ?? ''), description: String(item.description ?? ''), date: String(item.year ?? item.date ?? ''), context: item.context as string | undefined }));
   const hasAchievements = achievements.length > 0;
 
   return (
@@ -23,7 +27,7 @@ export default function Achievements() {
           description="Milestones are added here as the chapter records them."
         />
 
-        <div className="mt-16 lg:mt-24">
+        <div className="mt-16 lg:mt-24"><DataState loading={content.loading} error={content.error}>
           {!hasAchievements ? (
             <EmptyState
               icon={<Award size={28} strokeWidth={1.25} />}
@@ -89,7 +93,7 @@ export default function Achievements() {
               </div>
             </>
           )}
-        </div>
+        </DataState></div>
       </div>
     </section>
   );
