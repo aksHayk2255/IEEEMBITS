@@ -1,14 +1,10 @@
 import { ArrowUpRight, Layers } from 'lucide-react';
-import { projects as localProjects, type Project } from '../data/projects';
-import { useContent } from '../hooks/useContent';
-import DataState from './ui/DataState';
+import { projects } from '../data/projects';
 import EmptyState from './ui/EmptyState';
 import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 
 export default function Projects() {
-  const content = useContent<Record<string, unknown>>('projects', localProjects.map((project) => ({ ...project })));
-  const projects: Project[] = content.data.map((project) => ({ title: String(project.title ?? ''), summary: String(project.description ?? project.summary ?? ''), tags: Array.isArray(project.technologies) ? project.technologies.map(String) : Array.isArray(project.tags) ? project.tags.map(String) : [], image: project.image_url as string | undefined, link: project.github_url as string | undefined, year: project.created_at ? new Date(String(project.created_at)).getFullYear().toString() : undefined }));
   return (
     <section id="projects" className="bg-panel section-y">
       <div className="shell">
@@ -25,7 +21,7 @@ export default function Projects() {
           description="Work built by chapter members, from weekend experiments to full builds."
         />
 
-        <div className="mt-16 lg:mt-24"><DataState loading={content.loading} error={content.error}>
+        <div className="mt-16 lg:mt-24">
           {projects.length === 0 ? (
             <EmptyState
               icon={<Layers size={28} strokeWidth={1.25} />}
@@ -84,7 +80,7 @@ export default function Projects() {
               <li className="border-t border-line" aria-hidden="true" />
             </ul>
           )}
-        </DataState></div>
+        </div>
       </div>
     </section>
   );

@@ -42,6 +42,7 @@ export default function About() {
                 src={teamImage}
                 alt="IEEE Computer Society MBITS team"
                 loading="lazy"
+                decoding="async"
                 className="h-auto w-full rounded-sm object-contain"
               />
             </Reveal>

@@ -86,6 +86,7 @@ export default function Team() {
                         <img
                           src={team[activeIndex].photo}
                           alt={`${team[activeIndex].name}, ${team[activeIndex].role}`}
+                          decoding="async"
                           className="h-full w-full object-contain"
                         />
                       ) : (

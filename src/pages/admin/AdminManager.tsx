@@ -1,24 +1,136 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Pencil, Plus, Trash2, Upload } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { deleteContent, listContent, saveContent, uploadContentImage, type ContentTable } from '../../services/content';
 
-interface Field { key: string; label: string; type?: 'textarea' | 'url' | 'date' | 'number' | 'boolean' | 'image' | 'tags'; required?: boolean; }
-const configs: Record<string, { table: ContentTable; title: string; bucket?: string; fields: Field[] }> = {
+type FieldType = 'text' | 'textarea' | 'url' | 'date' | 'number' | 'boolean' | 'image' | 'tags';
+interface Field { key: string; label: string; type?: FieldType; required?: boolean; }
+interface ManagerConfig { table: ContentTable; title: string; bucket?: string; fields: Field[]; }
+type EditableRow = Record<string, unknown>;
+
+const configs: Record<string, ManagerConfig> = {
   events: { table: 'events', title: 'Events', bucket: 'events', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'date', label: 'Date', type: 'date', required: true }, { key: 'location', label: 'Location' }, { key: 'registration_url', label: 'Registration URL', type: 'url' }, { key: 'image_url', label: 'Image', type: 'image' }, { key: 'featured', label: 'Featured', type: 'boolean' }, { key: 'published', label: 'Published', type: 'boolean' }] },
-  projects: { table: 'projects', title: 'Projects', bucket: 'projects', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'technologies', label: 'Technologies', type: 'tags' }, { key: 'github_url', label: 'GitHub URL', type: 'url' }, { key: 'demo_url', label: 'Demo URL', type: 'url' }, { key: 'image_url', label: 'Image', type: 'image' }, { key: 'featured', label: 'Featured', type: 'boolean' }, { key: 'published', label: 'Published', type: 'boolean' }] },
+  projects: { table: 'projects', title: 'Projects', bucket: 'projects', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'technologies', label: 'Technologies (comma separated)', type: 'tags' }, { key: 'github_url', label: 'GitHub URL', type: 'url' }, { key: 'demo_url', label: 'Demo URL', type: 'url' }, { key: 'image_url', label: 'Image', type: 'image' }, { key: 'featured', label: 'Featured', type: 'boolean' }, { key: 'published', label: 'Published', type: 'boolean' }] },
   achievements: { table: 'achievements', title: 'Achievements', bucket: 'achievements', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'year', label: 'Year', type: 'number', required: true }, { key: 'image_url', label: 'Image', type: 'image' }, { key: 'featured', label: 'Featured', type: 'boolean' }, { key: 'published', label: 'Published', type: 'boolean' }] },
-  team: { table: 'team_members', title: 'Team members', bucket: 'team', fields: [{ key: 'name', label: 'Name', required: true }, { key: 'position', label: 'Position', required: true }, { key: 'image_url', label: 'Profile photo', type: 'image' }, { key: 'linkedin_url', label: 'LinkedIn URL', type: 'url' }, { key: 'email', label: 'Email', type: 'url' }, { key: 'display_order', label: 'Display order', type: 'number' }, { key: 'active', label: 'Active', type: 'boolean' }] },
-  gallery: { table: 'gallery', title: 'Gallery', bucket: 'gallery', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'image_url', label: 'Image', type: 'image', required: true }, { key: 'category', label: 'Category' }, { key: 'event_name', label: 'Event name' }, { key: 'display_order', label: 'Display order', type: 'number' }] },
+  team: { table: 'team_members', title: 'Team members', bucket: 'team', fields: [{ key: 'name', label: 'Name', required: true }, { key: 'position', label: 'Position', required: true }, { key: 'image_url', label: 'Profile photo', type: 'image' }, { key: 'linkedin_url', label: 'LinkedIn URL', type: 'url' }, { key: 'email', label: 'Email', type: 'text' }, { key: 'display_order', label: 'Display order', type: 'number' }, { key: 'active', label: 'Active', type: 'boolean' }] },
+  gallery: { table: 'gallery', title: 'Gallery', bucket: 'gallery', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'image_url', label: 'Image URL', type: 'image', required: true }, { key: 'category', label: 'Category' }, { key: 'event_name', label: 'Event name' }, { key: 'display_order', label: 'Display order', type: 'number' }] },
   announcements: { table: 'announcements', title: 'Announcements', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'link_url', label: 'Link URL', type: 'url' }, { key: 'priority', label: 'Priority', type: 'number' }, { key: 'active', label: 'Active', type: 'boolean' }] },
 };
 
-function slugify(value: string) { return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+const inputClass = 'mt-2 w-full rounded-sm border border-line bg-bg px-3 py-2.5 text-sm text-ink outline-none focus:border-accent';
+const rowLabel = (row: EditableRow) => String(row.title ?? row.name ?? 'Untitled');
+
 export default function AdminManager() {
-  const key = useLocation().pathname.split('/')[2] || 'events'; const config = configs[key] ?? configs.events; const [rows, setRows] = useState<Record<string, any>[]>([]); const [editing, setEditing] = useState<Record<string, any> | null>(null); const [busy, setBusy] = useState(false); const [message, setMessage] = useState('');
-  async function load() { const result = await listContent(config.table); if (result.error) setMessage(result.error.message); else setRows((result.data ?? []) as Record<string, any>[]); }
-  useEffect(() => { void load(); setEditing(null); }, [config.table]);
-  async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setBusy(true); setMessage(''); const form = new FormData(event.currentTarget); const values: Record<string, unknown> = {}; config.fields.forEach(field => { const value = form.get(field.key); if (field.type === 'boolean') values[field.key] = value === 'on'; else if (field.type === 'number') values[field.key] = value ? Number(value) : 0; else if (field.type === 'tags') values[field.key] = String(value ?? '').split(',').map(item => item.trim()).filter(Boolean); else if (value !== null) values[field.key] = String(value); }); if ((config.table === 'events' || config.table === 'projects') && 'title' in values) values.slug = slugify(String(values.title)); try { await saveContent(config.table, values, editing?.id); setMessage('Saved successfully.'); setEditing(null); event.currentTarget.reset(); await load(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Save failed.'); } finally { setBusy(false); } }
-  async function upload(field: Field, file: File) { if (!config.bucket) return; setBusy(true); try { const url = await uploadContentImage(config.bucket, file); setEditing(current => ({ ...(current ?? {}), [field.key]: url })); setMessage('Image uploaded. Save the record to apply it.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Upload failed.'); } finally { setBusy(false); } }
-  return <div><div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow text-accent">Admin / {config.title}</p><h1 className="mt-3 font-display text-5xl">{config.title}</h1></div><button onClick={() => setEditing({})} className="inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-4 py-3 text-sm font-medium text-bg"><Plus size={16} /> Add new</button></div>{message && <p className="mt-6 border border-line px-4 py-3 text-sm text-muted">{message}</p>}<div className="mt-8 grid gap-6 xl:grid-cols-[1fr_24rem]"> <div className="overflow-x-auto border border-line"><table className="w-full text-left text-sm"><thead className="bg-panel text-xs uppercase tracking-wider text-muted"><tr><th className="px-4 py-3">Title / name</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Actions</th></tr></thead><tbody>{rows.map(row => <tr key={row.id} className="border-t border-line"><td className="px-4 py-4 text-ink">{row.title ?? row.name}</td><td className="px-4 py-4 text-muted">{row.active === false ? 'Inactive' : 'Published'}</td><td className="px-4 py-4"><div className="flex gap-3"><button title="Edit" onClick={() => setEditing(row)} className="text-muted hover:text-accent"><Pencil size={16} /></button><button title="Delete" onClick={async () => { if (window.confirm('Delete this item?')) { await deleteContent(config.table, row.id); await load(); } }} className="text-muted hover:text-red-300"><Trash2 size={16} /></button></div></td></tr>)}</tbody></table>{rows.length === 0 && <p className="px-4 py-12 text-center text-sm text-muted">No content has been added yet.</p>}</div>{editing && <form onSubmit={submit} className="border border-line bg-panel p-5"><div className="mb-5 flex items-center justify-between"><h2 className="font-display text-2xl">{editing.id ? 'Edit item' : 'New item'}</h2><button type="button" onClick={() => setEditing(null)} className="text-sm text-muted">Cancel</button></div>{config.fields.map(field => <label key={field.key} className="mb-4 block text-xs uppercase tracking-wider text-muted">{field.label}{field.type === 'textarea' ? <textarea name={field.key} required={field.required} defaultValue={editing[field.key] ?? ''} className="mt-2 min-h-24 w-full rounded-sm border border-line bg-bg p-3 text-sm normal-case tracking-normal text-ink" /> : field.type === 'boolean' ? <input name={field.key} type="checkbox" defaultChecked={editing[field.key] ?? true} className="ml-3 accent-accent" /> : field.type === 'image' ? <span className="mt-2 flex items-center gap-3"><input type="hidden" name={field.key} value={editing[field.key] ?? ''} /><input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => { const file = e.target.files?.[0]; if (file) void upload(field, file); }} className="min-w-0 text-xs normal-case tracking-normal" /><Upload size={16} /></span> : <input name={field.key} required={field.required} type={field.type === 'url' ? 'url' : field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'} defaultValue={field.type === 'tags' ? (editing[field.key] ?? []).join(', ') : editing[field.key] ?? ''} className="mt-2 w-full rounded-sm border border-line bg-bg p-3 text-sm normal-case tracking-normal text-ink" />}</label>)}<button disabled={busy} className="mt-2 w-full rounded-sm bg-accent px-4 py-3 text-sm font-medium text-bg disabled:opacity-50">{busy ? 'Saving...' : 'Save item'}</button></form>}</div></div>;
+  const pathKey = useLocation().pathname.split('/')[2] || 'events';
+  const config = configs[pathKey] ?? configs.events;
+  const [rows, setRows] = useState<EditableRow[]>([]);
+  const [editing, setEditing] = useState<EditableRow | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await listContent(config.table);
+      if (result.error) throw result.error;
+      setRows((result.data ?? []) as EditableRow[]);
+      setMessage('');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to load content.');
+    } finally {
+      setLoading(false);
+    }
+  }, [config.table]);
+
+  useEffect(() => { setEditing(null); void load(); }, [load]);
+
+  function updateField(key: string, value: unknown) {
+    setEditing((current) => ({ ...(current ?? {}), [key]: value }));
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editing) return;
+    setBusy(true);
+    setMessage('');
+    const values: Record<string, unknown> = {};
+    config.fields.forEach((field) => {
+      let value = editing[field.key];
+      if (field.type === 'boolean') value = Boolean(value);
+      if (field.type === 'number') value = value === '' || value == null ? 0 : Number(value);
+      if (field.type === 'tags') value = Array.isArray(value) ? value : String(value ?? '').split(',').map((tag) => tag.trim()).filter(Boolean);
+      if (field.type !== 'boolean' && field.type !== 'number' && field.type !== 'tags') value = String(value ?? '');
+      values[field.key] = value;
+    });
+    if ((config.table === 'events' || config.table === 'projects') && 'title' in values) {
+      values.slug = String(values.title).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+    try {
+      await saveContent(config.table, values, typeof editing.id === 'string' ? editing.id : undefined);
+      setMessage('Saved successfully.');
+      setEditing(null);
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Save failed.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function uploadImage(field: Field, file?: File) {
+    if (!file || !config.bucket) return;
+    setBusy(true);
+    setMessage('');
+    try {
+      const url = await uploadContentImage(config.bucket, file);
+      updateField(field.key, url);
+      setMessage('Image uploaded. Save the record to apply it.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Upload failed.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeRow(row: EditableRow) {
+    if (typeof row.id !== 'string' || !window.confirm(`Delete “${rowLabel(row)}”?`)) return;
+    setBusy(true);
+    try {
+      await deleteContent(config.table, row.id);
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Delete failed.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return <div>
+    <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div><p className="eyebrow text-accent">Admin / {config.title}</p><h1 className="mt-3 font-display text-5xl">{config.title}</h1></div>
+      <button disabled={busy} onClick={() => { setMessage(''); setEditing({ published: true, active: true, featured: false, display_order: rows.length }); }} className="inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-4 py-3 text-sm font-medium text-bg disabled:opacity-50"><Plus size={16} /> Add new</button>
+    </div>
+    {message && <p role="status" className="mt-6 break-words border border-line px-4 py-3 text-sm text-muted">{message}</p>}
+    <div className="mt-8 grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="overflow-x-auto border border-line">
+        <table className="w-full min-w-[32rem] text-left text-sm">
+          <thead className="bg-panel text-xs uppercase tracking-wider text-muted"><tr><th className="px-4 py-3">Title / name</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Actions</th></tr></thead>
+          <tbody>{rows.map((row) => <tr key={String(row.id)} className="border-t border-line"><td className="max-w-xs truncate px-4 py-4 text-ink">{rowLabel(row)}</td><td className="px-4 py-4 text-muted">{row.active === false || row.published === false ? 'Inactive' : 'Published'}</td><td className="px-4 py-4"><div className="flex gap-3"><button disabled={busy} title="Edit" onClick={() => { setMessage(''); setEditing({ ...row }); }} className="text-muted hover:text-accent disabled:opacity-50"><Pencil size={16} /></button><button disabled={busy} title="Delete" onClick={() => void removeRow(row)} className="text-muted hover:text-red-300 disabled:opacity-50"><Trash2 size={16} /></button></div></td></tr>)}</tbody>
+        </table>
+        {loading ? <p className="px-4 py-12 text-center text-sm text-muted">Loading content...</p> : rows.length === 0 && <p className="px-4 py-12 text-center text-sm text-muted">No content has been added yet.</p>}
+      </div>
+      {editing && <form key={String(editing.id ?? 'new')} onSubmit={submit} className="space-y-4 border border-line bg-panel p-5">
+        <div className="mb-5 flex items-center justify-between"><h2 className="font-display text-2xl">{editing.id ? 'Edit item' : 'New item'}</h2><button type="button" onClick={() => setEditing(null)} className="text-sm text-muted">Cancel</button></div>
+        {config.fields.map((field) => {
+          const value = editing[field.key];
+          if (field.type === 'boolean') return <label key={field.key} className="flex items-center gap-3 text-sm text-muted"><input type="checkbox" checked={Boolean(value)} onChange={(event) => updateField(field.key, event.target.checked)} className="accent-[var(--color-accent)]" />{field.label}</label>;
+          if (field.type === 'image') return <div key={field.key}><label className="block text-sm text-muted">{field.label}<input type="url" required={field.required} value={String(value ?? '')} onChange={(event) => updateField(field.key, event.target.value)} className={inputClass} placeholder="https://…" /></label>{config.bucket && <label className="mt-2 flex cursor-pointer items-center gap-2 text-xs text-accent"><Upload size={14} /> Upload image (JPG, PNG, WebP; max 5 MB)<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => void uploadImage(field, event.target.files?.[0])} /></label>}</div>;
+          const common = { required: field.required, value: field.type === 'tags' && Array.isArray(value) ? value.join(', ') : String(value ?? ''), onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => updateField(field.key, event.target.value), className: inputClass };
+          return <label key={field.key} className="block text-sm text-muted">{field.label}{field.type === 'textarea' ? <textarea {...common} rows={4} /> : <input {...common} type={field.type === 'tags' ? 'text' : field.type ?? 'text'} />}</label>;
+        })}
+        <button disabled={busy} className="w-full rounded-sm bg-accent px-4 py-3 text-sm font-medium text-bg disabled:opacity-50">{busy ? 'Saving…' : 'Save item'}</button>
+      </form>}
+    </div>
+  </div>;
 }

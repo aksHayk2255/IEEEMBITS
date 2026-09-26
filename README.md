@@ -101,63 +101,43 @@ keyboard, and the layout has no horizontal overflow from 320px upward.
 
 ## Deploying
 
-## Supabase CMS and admin dashboard
+The public website is a Vite frontend. Supabase hosts the authentication,
+PostgreSQL database, and image storage used by the protected admin dashboard.
+Local TypeScript content remains as a fallback if Supabase is unavailable.
 
-The project includes a protected content-management dashboard at `/admin` and
-uses Supabase for authentication, PostgreSQL content, and image storage. The
-public site keeps its existing visual design and uses Supabase data when the
-environment variables are configured. Without them, local fallback content is
-used so the public GitHub Pages site remains buildable.
+### Supabase configuration
 
-### Environment variables
+Copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` using the project's URL and publishable key. Never put
+a Supabase secret/service-role key in frontend environment variables. Restart
+`npm run dev` after changing the file.
 
-Copy `.env.example` to `.env.local` and add the browser-safe Supabase values:
-
-```bash
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-publishable-anon-key
-```
-
-Never put a Supabase service-role key in this project.
-
-### Supabase setup
-
-1. Create a Supabase project.
-2. Run `supabase/schema.sql` in the Supabase SQL Editor.
-3. Run `supabase/storage.sql` in the SQL Editor.
-4. In Authentication, create the first user with email and password. Do not enable public signup.
-5. Copy that user's UUID and run:
+Run `supabase/schema.sql` in the Supabase SQL Editor. It can be rerun safely
+without deleting content rows. Create the admin login in Supabase Authentication,
+then add its user UUID:
 
 ```sql
-insert into public.admin_users (user_id) values ('YOUR_AUTH_USER_UUID');
+insert into public.admin_users (user_id) values ('AUTH_USER_UUID');
 ```
 
-6. Add the environment variables to `.env.local` and restart `npm run dev`.
-7. Open `/IEEEMBITS/admin/login` locally or `/IEEEMBITS/admin/login` on the deployed site.
+Then run `supabase/storage.sql` to create the image buckets, and
+`supabase/seed.sql` to import the existing events and team members from the
+local site data. The seed script skips existing rows if run again. Gallery
+images can be uploaded from the admin dashboard; achievements, projects, and
+announcements remain empty until real entries are added.
 
-The dashboard supports events, projects, achievements, team members, gallery
-images, and announcements. It validates JPG/JPEG/PNG/WebP uploads and limits
-them to 5 MB. Delete actions require confirmation. RLS policies allow public
-reads only for active team members and announcements, while all mutations
-require explicit membership in `admin_users`.
+Open `/IEEEMBITS/admin/login` locally or `/IEEEMBITS/admin/login` on the hosted
+site. The manager supports events, projects, achievements, team, gallery, and
+announcements.
 
-### Local development with CMS
+### GitHub Pages deployment
 
-```bash
-npm install
-npm run dev
-```
+Set repository Actions variables `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` to the same browser-safe values. GitHub Pages serves
+the frontend; Supabase remains the hosted backend and database.
 
-The public site is available at `http://localhost:5173/IEEEMBITS/` and the
-dashboard at `http://localhost:5173/IEEEMBITS/admin/login`.
-
-### Deployment with CMS
-
-Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository Actions
-variables or secrets before deploying. The existing GitHub Pages workflow
-builds the Vite app and preserves client-side admin routes with a `404.html`
-SPA fallback. Supabase remains the hosted backend; GitHub Pages only serves the
-frontend.
+For other static hosting providers, use build command `npm run build` and output
+directory `dist`.
 
 - **Vercel / Netlify** — framework preset "Vite", build `npm run build`, output `dist`.
 - **GitHub Pages** — set `base: '/<repo-name>/'` in `vite.config.ts`, then publish `dist`.

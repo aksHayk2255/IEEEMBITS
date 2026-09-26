@@ -16,7 +16,14 @@ function cellClass(span?: 'wide' | 'tall') {
 
 export default function Gallery() {
   const content = useContent<Record<string, unknown>>('gallery', localGallery.map((image) => ({ ...image })));
-  const gallery: GalleryImage[] = content.data.map((image) => ({ src: String(image.image_url ?? image.src ?? ''), alt: String(image.title ?? image.alt ?? 'Chapter gallery image'), caption: image.description as string | undefined, title: image.title as string | undefined, details: image.details as string | undefined }));
+  const gallery: GalleryImage[] = content.data.map((image) => ({
+    src: String(image.image_url ?? image.src ?? ''),
+    alt: String(image.title ?? image.alt ?? 'Chapter gallery image'),
+    caption: image.description as string | undefined ?? image.caption as string | undefined,
+    title: image.title as string | undefined,
+    details: image.details as string | undefined,
+    span: image.span as GalleryImage['span'],
+  }));
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
   useEffect(() => {
@@ -61,6 +68,7 @@ export default function Gallery() {
                         src={image.src}
                         alt={image.alt}
                         loading="lazy"
+                        decoding="async"
                         className="h-full w-full bg-panel object-contain transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                       />
                       {image.caption && (

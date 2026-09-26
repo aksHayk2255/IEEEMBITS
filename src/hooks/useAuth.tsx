@@ -19,31 +19,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(isSupabaseConfigured);
 
   useEffect(() => {
-    if (!supabase) return;
+    const client = supabase;
+    if (!client) return;
+
+    let mounted = true;
     const checkAdmin = async (nextSession: Session | null) => {
-      if (!nextSession) { setIsAdmin(false); return; }
+      if (!nextSession) {
+        if (mounted) setIsAdmin(false);
+        return;
+      }
       try {
-        const { data, error } = await supabase!.rpc('is_admin');
-        setIsAdmin(!error && data === true);
+        const { data, error } = await client.rpc('is_admin');
+        if (mounted) setIsAdmin(!error && data === true);
       } catch {
-        setIsAdmin(false);
+        if (mounted) setIsAdmin(false);
       }
     };
-    void supabase.auth.getSession().then(async ({ data }) => {
+
+    void client.auth.getSession().then(async ({ data }) => {
+      if (!mounted) return;
       setSession(data.session);
       await checkAdmin(data.session);
-      setLoading(false);
+      if (mounted) setLoading(false);
     }).catch(() => {
+      if (!mounted) return;
       setSession(null);
       setIsAdmin(false);
       setLoading(false);
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       setLoading(true);
-      void checkAdmin(nextSession).finally(() => setLoading(false));
+      void checkAdmin(nextSession).finally(() => {
+        if (mounted) setLoading(false);
+      });
     });
-    return () => data.subscription.unsubscribe();
+
+    return () => {
+      mounted = false;
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   const value: AuthContextValue = {
@@ -52,12 +68,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     configured: isSupabaseConfigured,
     signIn: async (email, password) => {
-      if (!supabase) return { error: 'Supabase is not configured.' };
+      if (!supabase) return { error: 'Supabase is not configured. Check the VITE_SUPABASE values and restart Vite.' };
       try {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         return error ? { error: error.message } : {};
       } catch {
-        return { error: 'Cannot connect to Supabase. Check VITE_SUPABASE_URL and restart the dev server.' };
+        return { error: 'Cannot reach Supabase. Check the project URL, key, and network connection.' };
       }
     },
     signOut: async () => {

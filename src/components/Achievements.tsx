@@ -8,7 +8,12 @@ import SectionHeading from './ui/SectionHeading';
 
 export default function Achievements() {
   const content = useContent<Record<string, unknown>>('achievements', localAchievements.map((item) => ({ ...item })));
-  const achievements: Achievement[] = content.data.map((item) => ({ title: String(item.title ?? ''), description: String(item.description ?? ''), date: String(item.year ?? item.date ?? ''), context: item.context as string | undefined }));
+  const achievements: Achievement[] = content.data.map((item) => ({
+    title: String(item.title ?? ''),
+    description: String(item.description ?? ''),
+    date: String(item.year ?? item.date ?? ''),
+    context: item.context as string | undefined,
+  }));
   const hasAchievements = achievements.length > 0;
 
   return (

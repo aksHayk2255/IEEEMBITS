@@ -47,12 +47,9 @@ export default function Hero() {
             <img
               src={heroImage}
               alt="IEEE Computer Society MBITS campus and chapter"
-              className="hidden aspect-[21/9] w-full rounded-sm object-cover sm:block"
-            />
-            <img
-              src={heroImage}
-              alt="IEEE Computer Society MBITS campus and chapter"
-              className="aspect-[4/3] w-full rounded-sm object-cover sm:hidden"
+              fetchPriority="high"
+              decoding="async"
+              className="aspect-[4/3] w-full rounded-sm object-cover sm:aspect-[21/9]"
             />
           </motion.div>
         </motion.div>

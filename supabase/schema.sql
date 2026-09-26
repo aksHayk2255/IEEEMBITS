@@ -4,12 +4,12 @@ create table if not exists public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
-
 alter table public.admin_users enable row level security;
 
 create or replace function public.is_admin() returns boolean
-language sql security definer set search_path = public
+language sql stable security definer set search_path = public
 as $$ select exists (select 1 from public.admin_users where user_id = auth.uid()); $$;
+grant execute on function public.is_admin() to anon, authenticated;
 
 create table if not exists public.events (
   id uuid primary key default gen_random_uuid(), title text not null, slug text unique not null,
@@ -66,13 +66,26 @@ alter table public.team_members enable row level security;
 alter table public.gallery enable row level security;
 alter table public.announcements enable row level security;
 
+-- Drop/recreate only named policies so this setup can be safely rerun; data is preserved.
+drop policy if exists "public read published events" on public.events;
+drop policy if exists "public read published projects" on public.projects;
+drop policy if exists "public read published achievements" on public.achievements;
+drop policy if exists "public read active team" on public.team_members;
+drop policy if exists "public read gallery" on public.gallery;
+drop policy if exists "public read active announcements" on public.announcements;
+drop policy if exists "admins manage events" on public.events;
+drop policy if exists "admins manage projects" on public.projects;
+drop policy if exists "admins manage achievements" on public.achievements;
+drop policy if exists "admins manage team" on public.team_members;
+drop policy if exists "admins manage gallery" on public.gallery;
+drop policy if exists "admins manage announcements" on public.announcements;
+
 create policy "public read published events" on public.events for select using (published = true);
 create policy "public read published projects" on public.projects for select using (published = true);
 create policy "public read published achievements" on public.achievements for select using (published = true);
 create policy "public read active team" on public.team_members for select using (active = true);
 create policy "public read gallery" on public.gallery for select using (true);
 create policy "public read active announcements" on public.announcements for select using (active = true);
-
 create policy "admins manage events" on public.events for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "admins manage projects" on public.projects for all to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "admins manage achievements" on public.achievements for all to authenticated using (public.is_admin()) with check (public.is_admin());

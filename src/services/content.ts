@@ -5,21 +5,31 @@ export type ContentTable = 'events' | 'projects' | 'achievements' | 'team_member
 export async function listContent(table: ContentTable) {
   if (!supabase) return { data: [], error: null };
   const query = supabase.from(table).select('*');
-  const ordered = table === 'events' ? query.order('date', { ascending: false })
+  return table === 'events' ? query.order('date', { ascending: false })
     : table === 'team_members' || table === 'gallery' ? query.order('display_order')
-    : table === 'announcements' ? query.order('priority', { ascending: false }) : query.order('created_at', { ascending: false });
-  return ordered;
+    : table === 'announcements' ? query.order('priority', { ascending: false })
+    : query.order('created_at', { ascending: false });
+}
+
+export async function countContent(table: ContentTable) {
+  if (!supabase) return { count: 0, error: new Error('Supabase is not configured.') };
+  const { count, error } = await supabase.from(table).select('*', { count: 'exact', head: true });
+  return { count: count ?? 0, error };
 }
 
 export async function saveContent(table: ContentTable, values: Record<string, unknown>, id?: string) {
   if (!supabase) throw new Error('Supabase is not configured.');
-  if (id) return supabase.from(table).update(values).eq('id', id).select().single();
-  return supabase.from(table).insert(values).select().single();
+  const result = id
+    ? await supabase.from(table).update(values).eq('id', id).select().single()
+    : await supabase.from(table).insert(values).select().single();
+  if (result.error) throw result.error;
+  return result.data;
 }
 
 export async function deleteContent(table: ContentTable, id: string) {
   if (!supabase) throw new Error('Supabase is not configured.');
-  return supabase.from(table).delete().eq('id', id);
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) throw error;
 }
 
 export async function uploadContentImage(bucket: string, file: File) {

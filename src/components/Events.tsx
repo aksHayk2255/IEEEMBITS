@@ -7,8 +7,12 @@ import SectionHeading from './ui/SectionHeading';
 import { useContent } from '../hooks/useContent';
 
 export default function Events() {
-  const content = useContent<Event & { location?: string }>('events', localEvents);
-  const events = content.data.map((event) => ({ ...event, category: event.category || event.location || 'Chapter event' }));
+  const content = useContent<(Event & { location?: string; registration_url?: string })>('events', localEvents);
+  const events = content.data.map((event) => ({
+    ...event,
+    category: event.category || event.location || 'Chapter event',
+    link: event.link || event.registration_url,
+  }));
   return (
     <section id="events" className="section-y">
       <div className="shell">
