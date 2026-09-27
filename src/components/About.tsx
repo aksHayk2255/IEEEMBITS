@@ -2,14 +2,10 @@ import Reveal from './ui/Reveal';
 import SectionHeading from './ui/SectionHeading';
 import teamImage from '../assets/images/Team.jpeg';
 
-/**
- * Replace the em dashes with real figures once they are confirmed.
- * Nothing here is invented — the dashes are intentional placeholders.
- */
 const stats = [
-  { value: '—', label: 'Members' },
-  { value: '—', label: 'Events' },
-  { value: '—', label: 'Years' },
+  { value: '7+', label: 'Members' },
+  { value: '5+', label: 'Events' },
+  { value: '6+', label: 'months' },
 ];
 
 export default function About() {
@@ -75,7 +71,7 @@ export default function About() {
                     <dd className="font-display text-4xl leading-none text-ink sm:text-5xl">
                       {stat.value}
                     </dd>
-                    <dt className="mt-3 text-xs tracking-[0.16em] text-muted uppercase">
+                    <dt className={`mt-3 text-xs tracking-[0.16em] text-muted ${stat.label === 'months' ? 'lowercase' : 'uppercase'}`}>
                       {stat.label}
                     </dt>
                   </div>
