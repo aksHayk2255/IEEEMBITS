@@ -24,6 +24,6 @@ export const gallery: GalleryImage[] = [
     title: 'Digital Marketing Talk Session',
     details:
       'As a collaborative initiative by IEEE CS SBC MBITS and IEEE CS SBC MEA, we proudly present an insightful talk session that explores the strategies and techniques behind effective digital marketing in today\'s fast-paced digital world.\n\nSpeaker: Mr. Visakh Nair\nChange and Transition Leader\nSales, Office of CEO @ UST Global',
-    span: 'wide',
+    span: 'tall',
   },
 ];

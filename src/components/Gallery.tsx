@@ -16,7 +16,10 @@ function cellClass(span?: 'wide' | 'tall') {
 
 export default function Gallery() {
   const content = useContent<Record<string, unknown>>('gallery', localGallery.map((image) => ({ ...image })));
-  const gallery: GalleryImage[] = content.data.map((image) => ({
+  const galleryContent: Record<string, unknown>[] = content.data.length > 0
+    ? content.data
+    : localGallery.map((image) => ({ ...image }));
+  const gallery: GalleryImage[] = galleryContent.map((image) => ({
     src: String(image.image_url ?? image.src ?? ''),
     alt: String(image.title ?? image.alt ?? 'Chapter gallery image'),
     caption: image.description as string | undefined ?? image.caption as string | undefined,

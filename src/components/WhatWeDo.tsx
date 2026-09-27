@@ -43,6 +43,8 @@ export default function WhatWeDo() {
               Build.
               <br />
               Connect.
+              <br />
+              Compete.
             </>
           }
           description="Four things the chapter keeps coming back to, whatever the semester looks like."
