@@ -1,5 +1,3 @@
-import sessionImage from '../assets/images/session-optimized.jpeg';
-
 export interface GalleryImage {
   /** Import the file from src/assets/images and pass the imported value here. */
   src: string;
@@ -13,17 +11,6 @@ export interface GalleryImage {
 }
 
 /**
- * Add real chapter photographs here. Until then the Gallery section
- * shows an empty state rather than stock imagery.
+ * Add unadorned chapter photographs here when they are available.
  */
-export const gallery: GalleryImage[] = [
-  {
-    src: sessionImage,
-    alt: 'IEEE Computer Society MBITS session',
-    caption: 'Insightful talk session on digital marketing',
-    title: 'Digital Marketing Talk Session',
-    details:
-      'As a collaborative initiative by IEEE CS SBC MBITS and IEEE CS SBC MEA, we proudly present an insightful talk session that explores the strategies and techniques behind effective digital marketing in today\'s fast-paced digital world.\n\nSpeaker: Mr. Visakh Nair\nChange and Transition Leader\nSales, Office of CEO @ UST Global',
-    span: 'tall',
-  },
-];
+export const galleryImages: GalleryImage[] = [];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ImageIcon, X } from 'lucide-react';
-import { gallery as localGallery, type GalleryImage } from '../data/gallery';
+import { galleryImages, type GalleryImage } from '../data/gallery';
 import { useContent } from '../hooks/useContent';
 import DataState from './ui/DataState';
 import EmptyState from './ui/EmptyState';
@@ -15,10 +15,10 @@ function cellClass(span?: 'wide' | 'tall') {
 }
 
 export default function Gallery() {
-  const content = useContent<Record<string, unknown>>('gallery', localGallery.map((image) => ({ ...image })));
+  const content = useContent<Record<string, unknown>>('gallery', galleryImages.map((image) => ({ ...image })));
   const galleryContent: Record<string, unknown>[] = content.data.length > 0
     ? content.data
-    : localGallery.map((image) => ({ ...image }));
+    : galleryImages.map((image) => ({ ...image }));
   const gallery: GalleryImage[] = galleryContent.map((image) => ({
     src: String(image.image_url ?? image.src ?? ''),
     alt: String(image.title ?? image.alt ?? 'Chapter gallery image'),
@@ -57,9 +57,8 @@ export default function Gallery() {
           {gallery.length === 0 ? (
             <EmptyState
               icon={<ImageIcon size={28} strokeWidth={1.25} />}
-              title="No photos yet"
-              hint="Drop images into src/assets/images and list them to fill this gallery."
-              file="src/data/gallery.ts"
+              title="To be added"
+              hint=""
             />
           ) : (
             <ul className="grid auto-rows-[14rem] grid-cols-1 gap-4 sm:grid-cols-3 lg:auto-rows-[18rem]">

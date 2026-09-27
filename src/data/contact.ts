@@ -15,10 +15,6 @@ export interface ContactEntry {
 export const contactDetails: ContactEntry[] = [
   { label: 'Email', value: '[Official email]' },
   { label: 'Location', value: '[MBITS location]' },
-  { label: 'Instagram', value: '[Instagram link]' },
-  { label: 'LinkedIn', value: '[LinkedIn link]' },
-  { label: 'YouTube', value: '[YouTube link]' },
-  { label: 'GitHub', value: '[GitHub link]' },
 ];
 
 /** True while the value is still an unfilled placeholder like "[Official email]". */
